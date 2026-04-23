@@ -1,14 +1,28 @@
 #-----------------------------------------------------------
-# Vivado v2018.2 (64-bit)
-# SW Build 2258646 on Thu Jun 14 20:03:12 MDT 2018
-# IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
-# Start of session at: Tue Mar 10 10:53:18 2026
-# Process ID: 10440
-# Current directory: C:/Users/george.york/Documents/ECE485_code/ece485_final_cadet_stage3
-# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent12992 C:\Users\george.york\Documents\ECE485_code\ece485_final_cadet_stage3\ece485_final_cadet_stage3.xpr
-# Log file: C:/Users/george.york/Documents/ECE485_code/ece485_final_cadet_stage3/vivado.log
-# Journal file: C:/Users/george.york/Documents/ECE485_code/ece485_final_cadet_stage3\vivado.jou
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Tue Apr 21 08:38:37 2026
+# Process ID         : 10072
+# Current directory  : D:/ece485_final_cadet_stage3
+# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent12980 D:\ece485_final_cadet_stage3\ece485_final_cadet_stage3.xpr
+# Log file           : D:/ece485_final_cadet_stage3/vivado.log
+# Journal file       : D:/ece485_final_cadet_stage3\vivado.jou
+# Running On         : myLaptop
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : AMD Ryzen 9 5980HX with Radeon Graphics        
+# CPU Frequency      : 3294 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 33720 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 35868 MB
+# Available Virtual  : 24312 MB
 #-----------------------------------------------------------
 start_gui
-open_project C:/Users/george.york/Documents/ECE485_code/ece485_final_cadet_stage3/ece485_final_cadet_stage3.xpr
+open_project D:/ece485_final_cadet_stage3/ece485_final_cadet_stage3.xpr
+upgrade_project -migrate_output_products
 update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1

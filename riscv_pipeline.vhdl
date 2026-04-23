@@ -176,7 +176,10 @@ architecture Behavioral of riscv_pipeline is
             load_addr : in STD_LOGIC;
             instr : in  STD_LOGIC_VECTOR(31 downto 0);
             npc    : in  STD_LOGIC_VECTOR(31 downto 0);
-            -- <add other IF registers?>
+            rd    : in STD_LOGIC_VECTOR(4 downto 0);
+            alu_op : in STD_LOGIC_VECTOR(3 downto 0);
+            rs1 : in STD_LOGIC_VECTOR(4 downto 0);
+            rs2 : in STD_LOGIC_VECTOR(4 downto 0);
             
             -- IF/ID pipeline registers
             if_id_reg_write : inout STD_LOGIC;
@@ -187,14 +190,17 @@ architecture Behavioral of riscv_pipeline is
             if_id_jump : inout STD_LOGIC;
             if_id_load_addr : inout STD_LOGIC;
             if_id_instr : inout  STD_LOGIC_VECTOR(31 downto 0);
-            
-            if_id_reg1_data  : in  STD_LOGIC_VECTOR(31 downto 0);
-            if_id_reg2_data  : in  STD_LOGIC_VECTOR(31 downto 0);
-            if_id_imm        : in  STD_LOGIC_VECTOR(31 downto 0);
-            
+            if_id_npc : inout STD_LOGIC_VECTOR(31 downto 0);
             if_id_alu_op : inout STD_LOGIC_VECTOR(3 downto 0);
-            -- <add other if_id registers>
-           
+            
+            if_id_imm : in STD_LOGIC_VECTOR(31 downto 0);
+            if_id_reg1_data : in STD_LOGIC_VECTOR(31 downto 0);
+            if_id_reg2_data : in STD_LOGIC_VECTOR(31 downto 0);
+            
+            if_id_rs1 : inout STD_LOGIC_VECTOR(4 downto 0);
+            if_id_rs2 : inout STD_LOGIC_VECTOR(4 downto 0);
+            if_id_rd : inout STD_LOGIC_VECTOR(4 downto 0);
+            
             -- ID/EX pipeline registers
             id_ex_reg_write : inout STD_LOGIC;
             id_ex_alu_src : inout STD_LOGIC;
@@ -203,20 +209,35 @@ architecture Behavioral of riscv_pipeline is
             id_ex_branch : inout STD_LOGIC;
             id_ex_jump : inout STD_LOGIC;
             id_ex_load_addr : inout STD_LOGIC;
-            id_ex_instr : out STD_LOGIC_VECTOR(31 downto 0);
+            id_ex_instr : inout STD_LOGIC_VECTOR(31 downto 0);
             id_ex_reg1_data  : inout  STD_LOGIC_VECTOR(31 downto 0);
-            -- <add other id_ex registers>
+            id_ex_npc : inout STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+            id_ex_alu_result : in STD_LOGIC_VECTOR(31 downto 0);
+            id_ex_alu_op : inout STD_LOGIC_VECTOR(3 downto 0);
+            id_ex_imm : inout STD_LOGIC_VECTOR(31 downto 0); 
+            id_ex_reg2_data : inout STD_LOGIC_VECTOR(31 downto 0);
+            id_ex_rs1 : inout STD_LOGIC_VECTOR(4 downto 0);
+            id_ex_rs2 : inout STD_LOGIC_VECTOR(4 downto 0);
+            id_ex_rd : inout STD_LOGIC_VECTOR(4 downto 0);
             
             -- EX/MEM pipeline registers        
             ex_mem_reg_write : inout STD_LOGIC;
             ex_mem_alu_src : inout STD_LOGIC;
             ex_mem_mem_read : inout STD_LOGIC;
             ex_mem_mem_write : inout STD_LOGIC;
-            ex_mem_branch : out STD_LOGIC;
-            ex_mem_jump : out STD_LOGIC;
+            ex_mem_branch : inout STD_LOGIC;
+            ex_mem_jump : inout STD_LOGIC;
             ex_mem_load_addr : inout STD_LOGIC;
-            ex_mem_reg1_data : out STD_LOGIC_VECTOR(31 downto 0);
-            -- <add other ex_mem registers>
+            ex_mem_reg1_data : inout STD_LOGIC_VECTOR(31 downto 0);
+            ex_mem_npc : inout  STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+            ex_mem_alu_result : inout STD_LOGIC_VECTOR(31 downto 0);
+            ex_mem_alu_op : inout STD_LOGIC_VECTOR(3 downto 0);
+            ex_mem_imm : inout STD_LOGIC_VECTOR(31 downto 0);
+            ex_mem_instr : inout STD_LOGIC_VECTOR(31 downto 0); 
+            ex_mem_reg2_data : inout STD_LOGIC_VECTOR(31 downto 0);
+            ex_mem_rs1 : inout STD_LOGIC_VECTOR(4 downto 0);
+            ex_mem_rs2 : inout STD_LOGIC_VECTOR(4 downto 0);
+            ex_mem_rd : inout STD_LOGIC_VECTOR(4 downto 0);
             
             -- MEM/WB pipeline registers
             mem_wb_reg_write : out STD_LOGIC;
@@ -224,9 +245,18 @@ architecture Behavioral of riscv_pipeline is
             mem_wb_mem_read : out STD_LOGIC;
             mem_wb_mem_write : out STD_LOGIC;
             mem_wb_load_addr : out STD_LOGIC;
-            mem_wb_alu_result  : out STD_LOGIC_VECTOR(31 downto 0)
-            -- <add other mem_wb registers>
-            
+            mem_wb_alu_result  : out STD_LOGIC_VECTOR(31 downto 0);
+            mem_wb_npc : out STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+            mem_wb_alu_op : out STD_LOGIC_VECTOR(3 downto 0);
+            mem_wb_imm  : out STD_LOGIC_VECTOR(31 downto 0);
+            mem_wb_instr : out STD_LOGIC_VECTOR(31 downto 0); 
+            mem_wb_reg1_data : out STD_LOGIC_VECTOR(31 downto 0);
+            mem_wb_reg2_data : out STD_LOGIC_VECTOR(31 downto 0);
+            mem_wb_rs1 : out STD_LOGIC_VECTOR(4 downto 0);
+            mem_wb_rs2 : out STD_LOGIC_VECTOR(4 downto 0);
+            mem_wb_rd : out STD_LOGIC_VECTOR(4 downto 0);
+            mem_wb_branch : out STD_LOGIC;
+            mem_wb_jump : out STD_LOGIC
 
         );
     end component;
@@ -282,18 +312,19 @@ begin
             start_stall => start_stall,
             stall_counter => stall_counter,
             -- inputs from IF
-            reg_write => <what control signal?>,
-            alu_src => <what control signal?>,
-            mem_read => <what control signal?>,
-            mem_write => <what control signal?>,
-            branch => <what control signal?>,
-            jump => <what control signal?>,
-            load_addr => <what control signal?>,
-            instr => <what register?>,
-            npc => <what register?>,
-            rd => instr(<define bit> downto<define bit>)),
-            alu_op => <what signal?>,
-            -- <add other IF registers?>
+            reg_write => reg_write,
+            alu_src => alu_src,
+            mem_read => mem_read,
+            mem_write => mem_write,
+            branch => branch,
+            jump => jump,
+            load_addr => load_addr,
+            instr => instr,
+            npc => npc,
+            rd => instr(11 downto 7),
+            alu_op => alu_op,
+            rs1 => rs1,
+            rs2 => rs2,
             
             -- IF/ID pipeline registers
             if_id_reg_write => if_id_reg_write,
@@ -304,21 +335,31 @@ begin
             if_id_jump => if_id_jump,
             if_id_load_addr => if_id_load_addr,
             if_id_instr => if_id_instr,
-            -- <add other if_id registers>
-        
-            -- ID/EX pipeline registers
-            id_ex_reg_write => id_ex_reg_write,
+            if_id_npc => if_id_npc,
+            if_id_alu_op => if_id_alu_op,
+            if_id_imm => if_id_imm,
+            if_id_reg1_data => if_id_reg1_data,
+            if_id_reg2_data => if_id_reg2_data,
+            if_id_rs1 => if_id_rs1,
+            if_id_rs2 => if_id_rs2,
+            if_id_rd => if_id_rd,
+            id_ex_alu_result => id_ex_alu_result,
+            id_ex_reg_write =>id_ex_reg_write,
+            id_ex_instr => id_ex_instr,
             id_ex_alu_src => id_ex_alu_src,
             id_ex_mem_read => id_ex_mem_read,
             id_ex_mem_write => id_ex_mem_write,
             id_ex_branch => id_ex_branch,
             id_ex_jump => id_ex_jump,
             id_ex_load_addr => id_ex_load_addr,
-            id_ex_instr => id_ex_instr,
             id_ex_reg1_data  => id_ex_reg1_data,
-            -- <add other id_ex registers>
-        
-            -- EX/MEM pipeline registers
+            id_ex_npc => id_ex_npc,
+            id_ex_alu_op => id_ex_alu_op,
+            id_ex_imm => id_ex_imm,
+            id_ex_reg2_data => id_ex_reg2_data,
+            id_ex_rs1 => id_ex_rs1,
+            id_ex_rs2 => id_ex_rs2,
+            id_ex_rd => id_ex_rd,
             ex_mem_reg_write => ex_mem_reg_write,
             ex_mem_alu_src => ex_mem_alu_src,
             ex_mem_mem_read => ex_mem_mem_read,
@@ -327,16 +368,32 @@ begin
             ex_mem_jump => ex_mem_jump,
             ex_mem_load_addr => ex_mem_load_addr,
             ex_mem_reg1_data => ex_mem_reg1_data,
-            -- <add other ex_mem registers>
-            
-            -- MEM/WB pipeline registers
+            ex_mem_npc => ex_mem_npc,
+            ex_mem_alu_result => ex_mem_alu_result,
+            ex_mem_alu_op => ex_mem_alu_op,
+            ex_mem_imm => ex_mem_imm,
+            ex_mem_instr => ex_mem_instr,
+            ex_mem_reg2_data => ex_mem_reg2_data,
+            ex_mem_rs1 => ex_mem_rs1,
+            ex_mem_rs2 => ex_mem_rs2,
+            ex_mem_rd => ex_mem_rd,
             mem_wb_reg_write => mem_wb_reg_write,
             mem_wb_alu_src => mem_wb_alu_src,
             mem_wb_mem_read => mem_wb_mem_read,
             mem_wb_mem_write => mem_wb_mem_write,
             mem_wb_load_addr => mem_wb_load_addr,
-            mem_wb_alu_result  => mem_wb_alu_result
-            -- <add other mem_wb registers>
+            mem_wb_alu_result  => mem_wb_alu_result,
+            mem_wb_npc => mem_wb_npc,
+            mem_wb_alu_op => mem_wb_alu_op,
+            mem_wb_imm => mem_wb_imm,
+            mem_wb_instr => mem_wb_instr,
+            mem_wb_reg1_data => mem_wb_reg1_data,
+            mem_wb_reg2_data => mem_wb_reg2_data,
+            mem_wb_rs1 => mem_wb_rs1,
+            mem_wb_rs2 => mem_wb_rs2,
+            mem_wb_rd => mem_wb_rd,
+            mem_wb_branch => mem_wb_branch,
+            mem_wb_jump => mem_wb_jump
         );
 
     -- Instruction memory
@@ -349,7 +406,7 @@ begin
 
     -- IF units
     -- decode instruction
-    opcode <= if_id_instr(<define bit> downto<define bit>);
+    opcode <= if_id_instr(6 downto 0);
     -- Control unit
     control_unit_inst: control_unit
         port map (
@@ -366,9 +423,9 @@ begin
     -- ALU control unit
     alu_control_inst: alu_control
             port map (
-                funct3 => instr(<define bit> downto <define bit>),
-                funct7 => instr(<define bit> downto <define bit>),
-                alu_op => <what signal?>
+                funct3 => instr(14 downto 12),
+                funct7 => instr(31 downto 25),
+                alu_op => alu_op
             );
 	
     -- Instantiate hazard detection unit
