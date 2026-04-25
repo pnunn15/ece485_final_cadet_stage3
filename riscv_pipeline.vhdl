@@ -433,16 +433,16 @@ begin
     hazard_unit: hazard_detection_unit
         port map (
             reset => reset,
-            if_id_mem_read => if_id_mem_read,
+            if_id_mem_read  => if_id_mem_read,
             if_id_load_addr => if_id_load_addr,
-            instr    => instr,
-            if_id_instr    => if_id_instr,
-            if_id_rd       => if_id_rd,
-            rs1      => instr(19 downto 15),
-            rs2      => instr(24 downto 20),
+            instr           => instr,
+            if_id_instr     => if_id_instr,
+            if_id_rd        => if_id_rd,
+            rs1             => rs1,
+            rs2             => rs2,
             -- need any other input registers?
-            stall_counter  => stall_counter,
-            start_stall    => start_stall
+            stall_counter   => stall_counter,
+            start_stall     => start_stall
         );
     -- temporary test... stall each instruction 3 cycles
     --start_stall <= '1' when stall_counter = 0 else '0';
@@ -468,18 +468,20 @@ begin
     -- ID units
 
     -- Register file [used in ID and WB stages]
+    reg_write_chip <= mem_wb_reg_write;
     reg_file_inst: reg_file
         port map (
             clk       => clk,
-            reg_write => mem_wb_reg_write,
-            rs1       => if_id_instr(19 downto 15),
-            rs2       => if_id_instr(24 downto 20),
+            reg_write => reg_write_chip,
+            rs1       => if_id_rs1,
+            rs2       => if_id_rs2,
             rd        => mem_wb_rd,
             data_in   => wb_data,
-            data_out1 => if_id_reg1_data,
-            data_out2 => if_id_reg2_data
+            data_out1 => reg1_data,
+            data_out2 => reg2_data
         );    
-
+    if_id_reg1_data <= reg1_data;
+    if_id_reg2_data <= reg2_data;
        
     -- Immediate generator
         immediate_generator_inst: immediate_generator

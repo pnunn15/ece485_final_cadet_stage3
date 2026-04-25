@@ -11,6 +11,6 @@ D:/ece485_final_cadet_stage3/immediate_generator.vhdl,1776782164,vhdl,,,,immedia
 D:/ece485_final_cadet_stage3/instr_mem.vhdl,1773022850,vhdl,,,,instr_mem,,,,,,,,
 D:/ece485_final_cadet_stage3/pc.vhdl,1776782164,vhdl,,,,pc_live,,,,,,,,
 D:/ece485_final_cadet_stage3/pipeline_registers.vhdl,1777007567,vhdl,,,,pipeline_registers,,,,,,,,
-D:/ece485_final_cadet_stage3/reg_file.vhdl,1776783234,vhdl,,,,reg_file,,,,,,,,
-D:/ece485_final_cadet_stage3/riscv_pipeline.vhdl,1777077582,vhdl,,,,riscv_pipeline,,,,,,,,
+D:/ece485_final_cadet_stage3/reg_file.vhdl,1777137253,vhdl,,,,reg_file,,,,,,,,
+D:/ece485_final_cadet_stage3/riscv_pipeline.vhdl,1777137966,vhdl,,,,riscv_pipeline,,,,,,,,
 D:/ece485_final_cadet_stage3/tb_riscv_pipeline.vhdl,1777051383,vhdl,,,,tb_riscv_pipeline,,,,,,,,
