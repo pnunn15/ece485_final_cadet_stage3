@@ -302,7 +302,8 @@ begin
         );
                 
     NPC <= std_logic_vector(signed(pc) + 4);
-              
+    rs1 <= instr(19 downto 15);
+    rs2 <= instr(24 downto 20);
     -- update temporary registers to support pipelining (state machine no longer needed... as each instruction is at a different state)
     -- Adding stall... if stall, then do not move the pipeline registers, and insert NOP instead
     pipe_reg: pipeline_registers
@@ -406,7 +407,7 @@ begin
 
     -- IF units
     -- decode instruction
-    opcode <= if_id_instr(6 downto 0);
+    opcode <= instr(6 downto 0);
     -- Control unit
     control_unit_inst: control_unit
         port map (
@@ -432,13 +433,13 @@ begin
     hazard_unit: hazard_detection_unit
         port map (
             reset => reset,
-            if_id_mem_read => <what control signal?>,
-            if_id_load_addr => <what control signal?>,
-            instr    => <what signal?>,
-            if_id_instr    => <what signal?>,
-            if_id_rd       => <what signal?>,
-            rs1      => instr(<define bit> downto <define bit>),
-            rs2      => instr(<define bit> downto <define bit>),
+            if_id_mem_read => if_id_mem_read,
+            if_id_load_addr => if_id_load_addr,
+            instr    => instr,
+            if_id_instr    => if_id_instr,
+            if_id_rd       => if_id_rd,
+            rs1      => instr(19 downto 15),
+            rs2      => instr(24 downto 20),
             -- need any other input registers?
             stall_counter  => stall_counter,
             start_stall    => start_stall
@@ -453,7 +454,7 @@ begin
             if reset = '1' then
                 stall_counter <= 0;
             elsif start_stall = '1' then
-                stall_counter <= 3;
+                stall_counter <= 2;
             elsif stall_counter > 0 then
                 stall_counter <= stall_counter - 1;
             end if;
@@ -461,7 +462,7 @@ begin
     end process;
 
     -- Stall signal
-    stall <= '1' when stall_counter > 0 else '0';        
+    stall <= '1' when (stall_counter > 0 or start_stall = '1') else '0';        
 
 --------------------------------------------------------------------------------
     -- ID units
@@ -470,13 +471,13 @@ begin
     reg_file_inst: reg_file
         port map (
             clk       => clk,
-            reg_write => <what signal?>,
-            rs1       => if_id_instr(<define bit> downto <define bit>),
-            rs2       => if_id_instr(<define bit> downto <define bit>),
-            rd        => <what signal?>,
+            reg_write => mem_wb_reg_write,
+            rs1       => if_id_instr(19 downto 15),
+            rs2       => if_id_instr(24 downto 20),
+            rd        => mem_wb_rd,
             data_in   => wb_data,
-            data_out1 => <which_register>,
-            data_out2 => <which_register>
+            data_out1 => if_id_reg1_data,
+            data_out2 => if_id_reg2_data
         );    
 
        
@@ -497,8 +498,8 @@ begin
     alu_input_a <= id_ex_reg1_data;
 
     -- mux to select alu input B
-    alu_input_b <= <which_register> when <which_control_signal> else
-                   <which_register>;
+    alu_input_b <= id_ex_imm when id_ex_alu_src = '1' else
+                   id_ex_reg2_data;
 
     -- ALU
     alu_inst: alu
@@ -528,12 +529,12 @@ begin
     mem_wb_mem_data <= mem_data;  
 
     -- Comparator 
-    not_equal_flag <= '1' when <what do we compare to decide if we should branch?> else '0';
+    not_equal_flag <= '1' when ex_mem_reg1_data /= ex_mem_reg2_data else '0';
             
-    next_pc <=  <math based on NPC and imm> when (<what control signals?>) else -- branch case
-                <math based on NPC and imm> when (<what control signals?>) else  -- jump case
-                pc when (<what control signals?>) else   -- stall case
-                NPC when (<what control signals?>); -- note: this happens during IF !!! 1st two during MEM
+    next_pc <=  std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (ex_mem_branch = '1' and not_equal_flag = '1') else -- branch case
+                std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (ex_mem_jump = '1') else  -- jump case
+                pc when (stall = '1') else   -- stall case
+                NPC; -- note: this happens during IF !!! 1st two during MEM
                             
     -- MEM/WB pipeline register
 
@@ -542,8 +543,8 @@ begin
     -- WB Units
     
     -- MUX to write back to register file
-    wb_data <= mem_wb_mem_data when (<what control signals?>) else 
-               x"10000000" when (<what control signals?>) else  -- hack for custom load_addr instruction
-               mem_wb_alu_result when (<what control signals?>);      
+    wb_data <= mem_wb_mem_data when mem_wb_mem_read = '1' else 
+               x"10000000" when mem_wb_load_addr = '1' else  -- hack for custom load_addr instruction
+               mem_wb_alu_result;      
    
 end Behavioral;
