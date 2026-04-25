@@ -2,3 +2,6 @@ Running: xsim.dir/tb_riscv_pipeline_behav/xsimk.exe -simmode gui -wdb tb_riscv_p
 Design successfully loaded
 Design Loading Memory Usage: 10968 KB (Peak: 10968 KB)
 Design Loading CPU Usage: 46 ms
+Simulation completed
+Simulation Memory Usage: 11920 KB (Peak: 11920 KB)
+Simulation CPU Usage: 61 ms
